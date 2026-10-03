@@ -7,13 +7,22 @@
 # Graphical User Interface Library
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QMainWindow, QLabel,
-    QVBoxLayout, QHBoxLayout, QFrame, QGridLayout
+    QVBoxLayout, QHBoxLayout, QFrame, QGridLayout,
+    QPushButton
 )
 from PyQt5.QtCore import Qt
 
+# Graph GUI
 import pyqtgraph as pg
 
+# Important for application
 import sys
+
+#
+# Variables
+#
+
+app_version = 0.2
 
 #
 # Classes
@@ -26,17 +35,20 @@ class mainwindow(QMainWindow): # <-- QMainWindow for GUI elements
 
     def initGUI(self):
         # Window settings (title, size, etc.)
-        self.setWindowTitle("Weather Station")
+        self.setWindowTitle("Beacon - Weather Station")
         self.setFixedSize(1000, 700)
 
         self.load_stylesheet()
 
-        # Setup of the layouts
+        # Setup of the main layout
 
         central = QWidget()
         self.setCentralWidget(central)
 
         main_layout = QVBoxLayout(central)
+
+        settings_bar = self.create_settings_bar()
+        main_layout.addLayout(settings_bar)
 
         header = self.create_header()
         main_layout.addLayout(header)
@@ -56,7 +68,7 @@ class mainwindow(QMainWindow): # <-- QMainWindow for GUI elements
     def create_header(self):
         layout = QHBoxLayout()
 
-        title = QLabel("Weather Station 🌦️ - 3CI")
+        title = QLabel("Dashboard")
         title.setObjectName("title")
 
         time = QLabel("0:00 | 30.09") # Time and date are to be filled up later
@@ -124,8 +136,39 @@ class mainwindow(QMainWindow): # <-- QMainWindow for GUI elements
         )
 
         return graph
-    
-    # ChatGPT generated function
+
+    def create_settings_bar(self):
+        layout = QHBoxLayout()
+
+        settings = QPushButton("⚙️ Settings")
+        dashboard = QPushButton("🌦️ Dashboard")
+        about = QPushButton("ℹ️ About")
+
+        connected_status = QLabel("Connected: 🔴")
+        connected_status.setObjectName("connectionStatus") # Names are needed to get the correct stylesheet
+
+        # Connect buttons
+
+        settings.clicked.connect(self.open_settings)
+        about.clicked.connect(self.open_about)
+
+        layout.addWidget(dashboard)
+        layout.addWidget(settings)
+        layout.addWidget(about)
+        layout.addStretch()
+        layout.addWidget(connected_status, alignment=Qt.AlignRight)
+
+        return layout
+
+    def open_settings(self):
+        self.settings_page = settingspage()
+        self.settings_page.show()
+
+    def open_about(self):
+        self.about_page = aboutpage()
+        self.about_page.show()
+       
+# ChatGPT generated function
     def load_stylesheet(self):
 
         self.setStyleSheet("""
@@ -137,6 +180,17 @@ class mainwindow(QMainWindow): # <-- QMainWindow for GUI elements
             font-size: 26px;
             font-weight: bold;
             color: #1f2937;
+        }
+
+        QLabel#connectionStatus {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: bold;
+        
         }
 
         QFrame#card {
@@ -170,7 +224,90 @@ class mainwindow(QMainWindow): # <-- QMainWindow for GUI elements
             padding: 8px;
             font-weight: bold;
         }
+
+        QPushButton {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        QPushButton:hover {
+            background-color: #f3f4f6;
+        }
+
+        QPushButton:pressed {
+            background-color: #e5e7eb;
+        }
         """)
+
+class settingspage(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # General window settings
+
+        self.setWindowTitle("Settings")
+        self.setFixedSize(500, 400)
+
+        # Layout setup
+
+        layout = QVBoxLayout()
+
+        layout2 = QHBoxLayout()
+
+        title = QLabel("⚙️ Settings")
+        #ChatGPT StyleSheet
+        title.setStyleSheet("""
+            font-size: 26px;
+            font-weight: bold;
+        """)
+
+        layout.addWidget(title)
+
+        # Settings buttons
+
+        temperature = QLabel("Temperature unit:")
+        layout2.addWidget(temperature)
+
+        celsius = QPushButton("°C")
+        fahrenheit = QPushButton("°F")
+
+        layout2.addWidget(celsius)
+        layout2.addWidget(fahrenheit)
+
+        layout2.addStretch()
+
+        layout.addLayout(layout2)
+
+        self.setLayout(layout)
+
+class aboutpage(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("About")
+        self.setFixedSize(500, 400)
+
+        layout = QVBoxLayout()
+
+        title = QLabel("About this program")
+        title.setStyleSheet("""
+            font-size: 26px;
+            font-weight: bold;
+        """)
+
+        layout.addWidget(title)
+
+        version = QLabel(f"Current version: {app_version}")
+        creators = QLabel(f"Created by: Levin Boehler, Dany Da Silva Marques")
+
+        layout.addWidget(version)
+        layout.addWidget(creators)
+
+        self.setLayout(layout)
 
 #
 # Functions

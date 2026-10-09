@@ -1,7 +1,5 @@
 # Written by Levin Boehler, started on 29.09.2026 at 18:36
 
-# Github test line
-
 #
 # Imports
 #
@@ -304,9 +302,14 @@ class aboutpage(QWidget):
         layout.addWidget(title)
 
         version = QLabel(f"Current version: {app_version}")
+        version.setStyleSheet("""
+            font-size: 16px;
+            color: #32CD32;
+        """)
         creators = QLabel(f"Created by: Levin Boehler, Dany Da Silva Marques")
 
         layout.addWidget(version)
+        layout.addStretch()
         layout.addWidget(creators)
 
         self.setLayout(layout)

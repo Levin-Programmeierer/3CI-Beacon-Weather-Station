@@ -22,7 +22,7 @@ import sys
 # Variables
 #
 
-app_version = 0.2
+app_version = 0.3
 
 #
 # Classes
@@ -252,6 +252,10 @@ class settingspage(QWidget):
         self.setWindowTitle("Settings")
         self.setFixedSize(500, 400)
 
+        # Settings variables
+
+        self.temperature_unit = 'C'
+
         # Layout setup
 
         layout = QVBoxLayout()
@@ -272,17 +276,25 @@ class settingspage(QWidget):
         temperature = QLabel("Temperature unit:")
         layout2.addWidget(temperature)
 
-        celsius = QPushButton("°C")
-        fahrenheit = QPushButton("°F")
+        change_temp_unit = QPushButton("Change Temperature unit")
 
-        layout2.addWidget(celsius)
-        layout2.addWidget(fahrenheit)
+        layout2.addWidget(change_temp_unit)
 
         layout2.addStretch()
 
         layout.addLayout(layout2)
 
         self.setLayout(layout)
+
+        change_temp_unit.clicked.connect(self.change_unit_temperature)
+
+    def change_unit_temperature(self):
+        match self.temperature_unit:
+            case 'C':
+                self.temperature_unit = 'F'
+            case 'F':
+                self.temperature_unit = 'C'
+        print(f"Changed temperature unit to: {self.temperature_unit}")
 
 class aboutpage(QWidget):
     def __init__(self):

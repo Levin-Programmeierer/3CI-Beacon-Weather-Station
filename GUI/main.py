@@ -38,6 +38,10 @@ from PySide6.QtGui import (
 # For image paths
 from pathlib import Path
 
+# Constants
+
+PROGRAM_VERSION = 0.5
+
 # Create app instance
 app =  QApplication([])
 # Mainwindow
@@ -47,7 +51,7 @@ class main_window(QWidget):
         # Application settings
         self.setWindowTitle("Beacon - Weather Station V0.5")
         self.resize(800, 500)
-        self.setWindowOpacity(0.95)
+        self.setWindowOpacity(0.90)
 
         self.settingswindow = settings
         self.aboutwindow = about
@@ -311,6 +315,9 @@ class settings_window(QWidget):
         self.background.lower()
         self.background.setGeometry(0, 0, 600, 400)
 
+        if self.background_image.isNull():
+            print(f"ERROR: Could not load background: {image_path}")
+
     def create_settings_buttons(self):
         self.top_layout = QHBoxLayout()
         self.settings_layout = QVBoxLayout()
@@ -387,7 +394,10 @@ class about_window(QWidget):
         self.setFixedSize(600, 400)
         self.load_fonts()
         self.create_background()
+        self.create_about_page()
         self.main_layout = QHBoxLayout()
+        self.main_layout.addLayout(self.about_layout)
+        self.setLayout(self.main_layout)
 
     def create_background(self):
         BASE_DIR = Path(__file__).resolve().parent
@@ -412,10 +422,64 @@ class about_window(QWidget):
         self.exit_button.setIcon(QIcon(str(icon_path)))
         self.exit_button.setFixedSize(40, 40)
         self.exit_button.setIconSize(QSize(30, 30))
+        self.exit_button.setStyleSheet("""
+                QPushButton {
+                    background-color: rgba(184, 234, 247, 180);
+                    border: 1px solid white;
+                    border-radius: 20px;
+                }
+                        
+                QPushButton:hover {
+                    background-color: rgba(255, 255, 255, 200);
+                }
+        """)
+
+        self.about_title = QLabel()
+        self.about_title.setText("About this program")
+        self.about_title.setFont(QFont(self.custom_font, 25))
+        self.about_title.setStyleSheet("color: #000000")
+
+        self.about_img = QLabel()
+        self.about_img.setPixmap(QPixmap((self.check_icon_availability("Alert002.ico"))))
+        self.about_img.setScaledContents(True)
+        self.about_img.setFixedSize(25, 25)
 
         self.top_layout.addWidget(self.exit_button)
-        self.top_layout.addStretch()
-        self.top_layout.addLayout(self.about_layout)
+        self.top_layout.addWidget(self.about_title)
+        self.top_layout.addWidget(self.about_img)
+        self.top_layout.addStretch()  
+
+        self.about_layout.addLayout(self.top_layout)
+        self.about_layout.addStretch()
+
+        self.about_frame = QFrame()
+        self.about_frame.setFixedSize(550, 250)
+        self.about_frame.setStyleSheet("""
+            QFrame {
+                background-color: rgba(184, 234, 247, 180);
+                border: 1px solid white;
+                border-radius: 20px;
+            }
+        """)
+
+        self.about_layout.addWidget(self.about_frame, Qt.AlignRight)
+
+        self.about_frame_layout = QVBoxLayout(self.about_frame)
+
+        self.program_version_label = QLabel()
+        self.program_version_label.setText(f"Program version: {PROGRAM_VERSION}")
+        self.program_version_label.setFont(QFont(self.custom_font, 15))
+        self.program_version_label.setStyleSheet("color: #000000; border-radius: 5px; background-color: rgba(128, 231, 105, 0.8)")
+        self.program_version_label.setFixedSize(190, 25)
+
+        self.creators_label = QLabel()
+        self.creators_label.setText("Created by: Levin Boehler & Dany Da Silva Marques")
+        self.creators_label.setFont(QFont(self.custom_font, 15))
+        self.creators_label.setStyleSheet("color: #000000; border-radius: 5px; background-color: rgba(128, 231, 105, 0.8)")
+        self.creators_label.setFixedSize(460, 25)
+
+        self.about_frame_layout.addWidget(self.program_version_label, Qt.AlignLeft)
+        self.about_frame_layout.addWidget(self.creators_label, Qt.AlignLeft)
 
         self.exit_button.clicked.connect(self.hide)
 

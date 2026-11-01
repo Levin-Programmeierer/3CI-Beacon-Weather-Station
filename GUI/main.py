@@ -42,12 +42,15 @@ from pathlib import Path
 app =  QApplication([])
 # Mainwindow
 class main_window(QWidget):
-    def __init__(self):
+    def __init__(self, settings, about):
         super().__init__()
         # Application settings
         self.setWindowTitle("Beacon - Weather Station V0.5")
         self.resize(800, 500)
         self.setWindowOpacity(0.95)
+
+        self.settingswindow = settings
+        self.aboutwindow = about
 
         # Load fonts
         self.load_fonts()
@@ -229,6 +232,9 @@ class main_window(QWidget):
 
         self.sidebarlayout.addWidget(self.about_button, alignment=Qt.AlignCenter)
 
+        self.settings_button.clicked.connect(self.settingswindow.show)
+        self.about_button.clicked.connect(self.aboutwindow.show)
+
     def check_icon_availability(self, icon):
         BASE_DIR = Path(__file__).resolve().parent
         icon_path = BASE_DIR / "assets" / "icons" / icon
@@ -273,7 +279,173 @@ class main_window(QWidget):
     def update_time(self):
         current_time = QTime.currentTime().toString("HH:mm:ss")
         self.time_label.setText(current_time)
-m_window = main_window()
+
+class settings_window(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Settings")
+        self.setFixedSize(600, 400)
+        self.load_fonts()
+
+        self.create_background()
+        self.create_settings_buttons()
+
+        self.main_layout = QHBoxLayout()
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout.setSpacing(20)
+
+        self.main_layout.addLayout(self.settings_layout)
+        self.setLayout(self.main_layout)
+
+
+    def create_background(self):
+        BASE_DIR = Path(__file__).resolve().parent
+        image_path = BASE_DIR / "assets" / "backgrounds" / "b2.jpg"
+
+        self.background_image = QPixmap(str(image_path))
+
+        self.background = QLabel(self)
+        self.background.setPixmap(self.background_image)
+        self.background.setScaledContents(True)
+
+        self.background.lower()
+        self.background.setGeometry(0, 0, 600, 400)
+
+    def create_settings_buttons(self):
+        self.top_layout = QHBoxLayout()
+        self.settings_layout = QVBoxLayout()
+
+        icon_path = self.check_icon_availability("Sign026.ico")
+
+        self.exit_button = QPushButton()
+        self.exit_button.setIcon(QIcon(str(icon_path)))
+        self.exit_button.setFixedSize(40, 40)
+        self.exit_button.setIconSize(QSize(30, 30))
+        self.settings_label = QLabel()
+        self.settings_label.setFont(QFont(self.custom_font, 30))
+        self.settings_label.setStyleSheet("color: #000000;")
+        self.settings_label.setText("Settings")
+
+        self.exit_button.setStyleSheet("""
+                QPushButton {
+                    background-color: rgba(184, 234, 247, 180);
+                    border: 1px solid white;
+                    border-radius: 20px;
+                }
+                        
+                QPushButton:hover {
+                    background-color: rgba(255, 255, 255, 200);
+                }
+        """)
+
+        self.exit_button.clicked.connect(self.hide)
+
+        self.top_layout.addWidget(self.exit_button, alignment=Qt.AlignLeft)
+        self.top_layout.addWidget(self.settings_label)
+        self.top_layout.addStretch()    
+        self.settings_layout.addLayout(self.top_layout)
+
+        self.settings_frame = QFrame()
+        self.settings_frame.setFixedSize(500, 250)
+        self.settings_frame.setStyleSheet("""
+            QFrame {
+                background-color: rgba(184, 234, 247, 180);
+                border: 1px solid white;
+                border-radius: 20px;
+            }            
+        """)
+
+        self.settings_layout.addWidget(self.settings_frame, alignment=Qt.AlignRight)
+
+    def check_icon_availability(self, icon):
+        BASE_DIR = Path(__file__).resolve().parent
+        icon_path = BASE_DIR / "assets" / "icons" / icon
+        return icon_path
+
+    def load_fonts(self):
+
+        BASE_DIR = Path(__file__).resolve().parent
+        font_path = BASE_DIR / "assets" / "fonts" / "FrutigerAero.ttf"
+
+        font_id = QFontDatabase.addApplicationFont(str(font_path))
+
+        if font_id == -1:
+            print("Font loading failed")
+            self.custom_font = "Segoe UI"
+            return
+
+        font_families = QFontDatabase.applicationFontFamilies(font_id)
+
+        self.custom_font = font_families[0]
+
+        print("Loaded font:", self.custom_font)
+
+class about_window(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("About")
+        self.setFixedSize(600, 400)
+        self.load_fonts()
+        self.create_background()
+        self.main_layout = QHBoxLayout()
+
+    def create_background(self):
+        BASE_DIR = Path(__file__).resolve().parent
+        image_path = BASE_DIR / "assets" / "backgrounds" / "b3.jpg"
+
+        self.background_image = QPixmap(str(image_path))
+
+        self.background = QLabel(self)
+        self.background.setPixmap(self.background_image)
+        self.background.setScaledContents(True)
+
+        self.background.lower()
+        self.background.setGeometry(0, 0, 600, 400)
+
+    def create_about_page(self):
+        self.top_layout = QHBoxLayout()
+        self.about_layout = QVBoxLayout()
+        
+        icon_path = self.check_icon_availability("Sign026.ico")
+        
+        self.exit_button = QPushButton()
+        self.exit_button.setIcon(QIcon(str(icon_path)))
+        self.exit_button.setFixedSize(40, 40)
+        self.exit_button.setIconSize(QSize(30, 30))
+
+        self.top_layout.addWidget(self.exit_button)
+        self.top_layout.addStretch()
+        self.top_layout.addLayout(self.about_layout)
+
+        self.exit_button.clicked.connect(self.hide)
+
+    def check_icon_availability(self, icon):
+        BASE_DIR = Path(__file__).resolve().parent
+        icon_path = BASE_DIR / "assets" / "icons" / icon
+        return icon_path
+
+    def load_fonts(self):
+
+        BASE_DIR = Path(__file__).resolve().parent
+        font_path = BASE_DIR / "assets" / "fonts" / "FrutigerAero.ttf"
+
+        font_id = QFontDatabase.addApplicationFont(str(font_path))
+
+        if font_id == -1:
+            print("Font loading failed")
+            self.custom_font = "Segoe UI"
+            return
+
+        font_families = QFontDatabase.applicationFontFamilies(font_id)
+
+        self.custom_font = font_families[0]
+
+        print("Loaded font:", self.custom_font)
+    
+s_window = settings_window()
+abt_window = about_window()
+m_window = main_window(s_window, abt_window)
+
 
 if __name__ == "__main__":
     sys.exit(app.exec())

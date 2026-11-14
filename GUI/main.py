@@ -50,8 +50,12 @@ from PySide6.QtGui import (
 # For image paths
 from pathlib import Path
 
-# Other system libaries
+# Other system libraries
 import os
+
+# Mäin geilen sorteier programm
+
+import data_handler
 
 # Constants
 
@@ -1209,7 +1213,9 @@ class connection_window(QWidget):
         super().__init__()
 
         self.setWindowTitle("Device connection")
-        self.setFixedSize(600, 400)
+        self.SIZE_H = 400
+        self.SIZE_W = 600
+        self.setFixedSize(self.SIZE_W, self.SIZE_H)
 
         self.custom_font = custom_font
         self.custom_font_bold = custom_font_bold
@@ -1264,6 +1270,29 @@ class connection_window(QWidget):
         self.connection_frame = GlassFrame(radius=20, shadow=True, hover_effect=True, theme="blue")
         self.connection_frame.setFixedSize(540, 275)
 
+        self.v_frame_layout = QVBoxLayout(self.connection_frame)
+        self.h_frame_layout = QHBoxLayout()
+
+        self.setting_comport = QLabel("Set COM port: ")
+        self.setting_comport.setFont(QFont(CUSTOM_FONT2, 12))
+        self.setting_comport.setFixedHeight(32)
+        self.setting_comport.setFixedWidth(self.SIZE_W / 2 - 30) # This is so the box scales automatically with the screen size 
+        # Green information label style
+        settings_style = """
+            QLabel {
+                color: #164D35;
+                border: 1px solid rgba(255, 255, 255, 210);
+                border-radius: 8px;
+                padding: 5px 9px;
+                background-color: rgba(190, 255, 210, 155);
+            }
+        """
+
+        self.setting_comport.setStyleSheet(settings_style)
+
+        self.v_frame_layout.addWidget(self.setting_comport, Qt.AlignLeft)
+        self.h_frame_layout.addLayout(self.v_frame_layout, Qt.AlignLeft)
+
         self.top_layout.addWidget(self.exit_button, Qt.AlignLeft)
         self.top_layout.addWidget(self.title, Qt.AlignLeft)
         self.connection_layout.addLayout(self.top_layout)
@@ -1288,6 +1317,7 @@ class connection_window(QWidget):
     
 if __name__ == "__main__":
     CUSTOM_FONT1, CUSTOM_FONT2 = load_fonts()
+    device = data_handler.ESP32("COM3", 115200)
     s_window = settings_window(CUSTOM_FONT1, CUSTOM_FONT2)
     abt_window = about_window(CUSTOM_FONT1, CUSTOM_FONT2)
     con_window = connection_window(CUSTOM_FONT1, CUSTOM_FONT2)

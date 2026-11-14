@@ -686,6 +686,17 @@ class main_window(QWidget):
         self.show()
 
     def create_dashboard(self):
+        # To reuse so i dont need to copy paste. Vum SciPr Kuer. -> Nie code wiederhuelen
+        info_style = """
+                    QLabel {
+                        color: #164D35;
+                        border: 1px solid rgba(255, 255, 255, 210);
+                        border-radius: 8px;
+                        padding: 5px 9px;
+                        background-color: rgba(190, 255, 210, 155);
+                    }
+                """
+
         self.dashboard_layout = QVBoxLayout()
         self.dashboard_top = QHBoxLayout()
 
@@ -706,6 +717,31 @@ class main_window(QWidget):
         self.titleimg = QLabel()
         self.titleimg.setPixmap(QPixmap(str(icon_path)))
         self.titleimg.setFixedSize(60,60)
+
+        # Temperatue & Humidity & Pressure & Forecast
+
+        self.statsFrame = GlassFrame(theme="green")
+        self.statsFrame.setFixedSize(300, 200)
+
+        self.statsVLayout = QVBoxLayout(self.statsFrame)
+
+        self.tempLabel = QLabel()
+        self.humidLabel = QLabel()
+        self.pressureLabel = QLabel()
+        self.tempLabel.setText("Temperature: ")
+        self.humidLabel.setText("Humidity: ")
+        self.pressureLabel.setText("Pressure: ")
+
+        self.tempLabel.setStyleSheet(info_style)
+        self.humidLabel.setStyleSheet(info_style)
+        self.pressureLabel.setStyleSheet(info_style)
+        self.tempLabel.setFont(QFont(self.custom_font, 12))
+        self.humidLabel.setFont(QFont(self.custom_font, 12))
+        self.pressureLabel.setFont(QFont(self.custom_font, 12))
+
+        self.statsVLayout.addWidget(self.tempLabel)
+        self.statsVLayout.addWidget(self.humidLabel)
+        self.statsVLayout.addWidget(self.pressureLabel)
 
         self.dashboard_top.addWidget(self.title)
         self.dashboard_top.addWidget(self.titleimg)
@@ -731,14 +767,15 @@ class main_window(QWidget):
         """)
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_time)
+        self.timer.timeout.connect(self.update_stats)
         self.timer.start(1000) # For updating the time
 
-        self.update_time()
-
+        self.update_stats()
+        
         self.status_bar_layout.addWidget(self.time_label, alignment=Qt.AlignRight)
 
         self.dashboard_layout.addLayout(self.dashboard_top)
+        self.dashboard_layout.addWidget(self.statsFrame)
         self.dashboard_layout.addStretch()
         self.dashboard_layout.addWidget(self.status_bar, alignment=Qt.AlignRight)
 
@@ -814,9 +851,13 @@ class main_window(QWidget):
     def load_settings(self):
         pass
 
-    def update_time(self):
+    def update_stats(self):
         current_time = QTime.currentTime().toString("HH:mm:ss")
         self.time_label.setText(current_time)
+        data = device.read_data()
+        self.temperature_data = data["temperature"]
+        self.humidity_data = data["humidity"]
+        self.pressure_data = data["pressure"]
 
 class settings_window(QWidget):
     def __init__(self, custom_font, custom_font_bold):

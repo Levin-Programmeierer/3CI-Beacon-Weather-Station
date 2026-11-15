@@ -1,6 +1,7 @@
 # The first data handler 😱😱😱😱😱
 # Created by Levin Boehler of course!
 # 10:06 - 14.11.2026
+# It works 😱😱😱
 import serial
 import time
 

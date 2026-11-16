@@ -27,14 +27,16 @@ class ESP32:
     def read_data(self):
         # Read and parse data, aka sort data
         if self.connection is None:
-            raise ConnectionError("ESP32 is not connected")
-
-        line = self.connection.readline().decode(
-            "utf-8"
-        ).strip()
-
-        if not line:
+            #raise ConnectionError("ESP32 is not connected")
+            self.no_connection()
             return None
+        else:
+            line = self.connection.readline().decode(
+                "utf-8"
+            ).strip()
+
+            if not line:
+                return None
 
         try:
             data = {}
@@ -47,6 +49,9 @@ class ESP32:
 
         except ValueError:
             return None
+
+    def no_connection(self):
+        pass
 
     def disconnect(self):
         # disconnect

@@ -855,9 +855,10 @@ class main_window(QWidget):
         current_time = QTime.currentTime().toString("HH:mm:ss")
         self.time_label.setText(current_time)
         data = device.read_data()
-        self.temperature_data = data["temperature"]
-        self.humidity_data = data["humidity"]
-        self.pressure_data = data["pressure"]
+        if device.connection != None:
+            self.temperature_data = data["temperature"]
+            self.humidity_data = data["humidity"]
+            self.pressure_data = data["pressure"]
 
 class settings_window(QWidget):
     def __init__(self, custom_font, custom_font_bold):
